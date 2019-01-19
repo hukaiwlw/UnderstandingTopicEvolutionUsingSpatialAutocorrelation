@@ -61,7 +61,7 @@ library(splm)  # spatial panal data model package
 #            ylab = "Spatially lagged total citation clounts", main = "Moran's I = 0.03676")
 # dev.off()
 
-setwd("D:/Geodawksp/exmaple")
+setwd("D:/publications/GitWksp/Shapefiles/exmaple")
 sanfran <- readShapePoly("Sanfran_crime.shp")
 plot(sanfran)
 sf.nb <- poly2nb(sanfran, queen = FALSE)

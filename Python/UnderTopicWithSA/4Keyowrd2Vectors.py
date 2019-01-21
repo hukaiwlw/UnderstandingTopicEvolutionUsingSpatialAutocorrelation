@@ -1,11 +1,17 @@
-import WOSparser
+import WoSdataparser
+from gensim.models import word2vec
+from sklearn.manifold import TSNE
+import pandas as pd
+import numpy as np
 ###
 #4. transfer the keyword collections into the word vectors
 ###
-dir="D:/publications/GitWksp/WoSdata/naturalhazard/"
+dir="D:/publications/GitWksp/WoSdata/ngeo/"
+dirbk="D:/publications/GitWksp/WoSdata/naturalhazard/"
 dirDEST=dir+"cu1DECOST.txt"
 dirKeywordList=dir+"keywordlist.csv"
-corpus1=WOSparser.load_from_file(dirDEST)
+model=word2vec.Word2Vec.load(dirbk+"w2v.m")
+corpus1=WoSdataparser.load_from_file(dirDEST)
 strlist=corpus1.split(" ")
 ## remove the repeative keywords
 strlist=list(set(strlist))
@@ -18,7 +24,7 @@ for stritem in strlist:
     count=0.0
     sts1 = []
     try:
-        if "_" in stritem:  # 对某些phrase去平均
+        if "_" in stritem:  # compute the average of the word vectors
             sts1 = np.array(stritem.split("_"))
             for st in sts1:
                 tm_a +=np.add(tm_a,model[st])
@@ -35,17 +41,18 @@ for stritem in strlist:
             listtext.append(stritem)
     except:
         count_err+=1
-        print("in the error"+str(count_err)+":"+stritem)
+        print("error"+str(count_err)+":"+stritem)
 
 X_tsne = TSNE(learning_rate=100).fit_transform(listres)
-keywordXY=[]
 keywordList=[]
 count=0
 for eachkeyword in listtext:
+    keywordXY = []
     keywordXY.append(eachkeyword)
-    keywordXY.append(X_tsne[count,0])
-    keywordXY.append(X_tsne[count,1])
+    keywordXY.append(10000*X_tsne[count,0]+100000)
+    keywordXY.append(10000*X_tsne[count,1]+100000)
     count=count+1
     keywordList.append(keywordXY)
 df=pd.DataFrame(keywordList,columns=["keyword", "X", "Y"])
+#dirKeywordList=dir+"keywordlist.csv"
 df.to_csv(dirKeywordList)
